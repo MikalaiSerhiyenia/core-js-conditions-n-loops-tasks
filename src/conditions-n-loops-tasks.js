@@ -428,19 +428,21 @@ function shuffleChar(str, iterations) {
     let start = '';
     let end = '';
     for (let i = 0; i < input.length; i += 1) {
-      if (i % 2) {
-        end += input[i];
-      } else {
+      if (i % 2 === 0) {
         start += input[i];
+      } else {
+        end += input[i];
       }
     }
     return start + end;
   }
+
   let result = str;
-  let num = iterations;
-  while (num > 0) {
+  let remainingIterations = iterations;
+
+  while (remainingIterations > 0) {
     result = shuffle(result);
-    num -= 1;
+    remainingIterations -= 1;
   }
   return result;
 }
@@ -463,22 +465,49 @@ function shuffleChar(str, iterations) {
  * @returns {number} The nearest larger number, or original number if none exists.
  */
 function getNearestBigger(number) {
-  let array = Array.from(number.toString()).map(Number);
-  let i = array.length - 2;
-  while (i >= 0 && array[i] >= array[i + 1]) {
+  const digits = [];
+  let num = number;
+  while (num > 0) {
+    digits.unshift(num % 10);
+    num = Math.floor(num / 10);
+  }
+
+  const n = digits.length;
+  let i = n - 2;
+
+  while (i >= 0 && digits[i] >= digits[i + 1]) {
     i -= 1;
   }
-  if (i === -1) {
+
+  if (i < 0) {
     return number;
   }
-  let j = array.length - 1;
-  while (array[j] <= array[i]) {
+
+  let j = n - 1;
+  while (j > i && digits[j] <= digits[i]) {
     j -= 1;
   }
-  [array[i], array[j]] = [array[j], array[i]];
-  const temp = array.splice(i + 1).reverse();
-  array = array.concat(temp);
-  return parseInt(array.join(''), 10);
+
+  const temp1 = digits[i];
+  digits[i] = digits[j];
+  digits[j] = temp1;
+
+  let start = i + 1;
+  let end = n - 1;
+  while (start < end) {
+    const temp2 = digits[start];
+    digits[start] = digits[end];
+    digits[end] = temp2;
+    start += 1;
+    end -= 1;
+  }
+
+  let result = 0;
+  for (let k = 0; k < n; k += 1) {
+    result = result * 10 + digits[k];
+  }
+
+  return result;
 }
 
 module.exports = {
